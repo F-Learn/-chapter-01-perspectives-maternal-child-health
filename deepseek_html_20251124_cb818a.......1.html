@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maternal and Child Health Care Flashcards</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a5f7a 0%, #2d8da3 100%);
+            min-height: 100vh;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            height: 95vh;
+            max-height: 95vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a5f7a, #2d8da3);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.1"><path d="M30,30 Q50,10 70,30 T90,50 T70,70 T50,90 T30,70 T10,50 T30,30 Z" fill="white"/></svg>');
+        }
+        
+        .header h1 {
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .header .subtitle {
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            opacity: 0.9;
+            position: relative;
+        }
+        
+        .progress {
+            background: #0f3b4d;
+            height: 8px;
+            width: 100%;
+            flex-shrink: 0;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #1a5f7a, #2d8da3);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .flashcard {
+            padding: clamp(10px, 3vw, 20px);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8f9fa;
+            overflow-y: auto;
+        }
+        
+        .question-container {
+            display: flex;
+            gap: clamp(10px, 2vw, 15px);
+            align-items: flex-start;
+            margin-bottom: clamp(10px, 2vw, 15px);
+        }
+        
+        .question-icon {
+            background: #1a5f7a;
+            color: white;
+            width: clamp(35px, 8vw, 50px);
+            height: clamp(35px, 8vw, 50px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-weight: bold;
+            flex-shrink: 0;
+            box-shadow: 0 4px 8px rgba(26, 95, 122, 0.3);
+        }
+        
+        .question {
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            line-height: 1.6;
+            color: #2c3e50;
+            flex-grow: 1;
+            font-weight: 500;
+        }
+        
+        .multiple-select-indicator {
+            background: #e74c3c;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(6px, 1.5vw, 10px);
+            margin-bottom: clamp(10px, 2vw, 20px);
+            flex: 1;
+        }
+        
+        .option {
+            padding: clamp(10px, 2vw, 14px) clamp(12px, 2.5vw, 18px);
+            border: 2px solid #e0f0f5;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            display: flex;
+            align-items: center;
+            gap: clamp(8px, 1.5vw, 10px);
+            font-size: clamp(0.85rem, 2vw, 1rem);
+        }
+        
+        .option:hover {
+            background: #f0f9fc;
+            border-color: #b8e0eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .option-letter {
+            background: #f0f9fc;
+            color: #2c3e50;
+            width: clamp(24px, 5vw, 28px);
+            height: clamp(24px, 5vw, 28px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            font-size: clamp(0.75rem, 1.8vw, 0.9rem);
+        }
+        
+        /* CORRECT - ALWAYS GREEN */
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .option.correct .option-letter {
+            background: #28a745;
+            color: white;
+        }
+        
+        /* INCORRECT - ALWAYS RED */
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .option.incorrect .option-letter {
+            background: #dc3545;
+            color: white;
+        }
+        
+        /* Remove the selected class to prevent blue highlighting */
+        
+        .feedback {
+            padding: clamp(12px, 2.5vw, 16px);
+            border-radius: 12px;
+            margin-bottom: clamp(10px, 2vw, 16px);
+            display: none;
+            align-items: center;
+            gap: clamp(8px, 1.5vw, 12px);
+            font-weight: 500;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+        }
+        
+        .feedback.correct {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            display: flex;
+        }
+        
+        .feedback.incorrect {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+            display: flex;
+        }
+        
+        .feedback-icon {
+            font-size: clamp(1.2rem, 3vw, 1.4rem);
+            flex-shrink: 0;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: clamp(12px, 2.5vw, 16px) clamp(16px, 3vw, 24px);
+            background: #f0f9fc;
+            border-top: 1px solid #e0f0f5;
+            flex-shrink: 0;
+        }
+        
+        .counter {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+        }
+        
+        .btn {
+            padding: clamp(10px, 2vw, 12px) clamp(15px, 2.5vw, 20px);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: clamp(6px, 1vw, 8px);
+            font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+            white-space: nowrap;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1a5f7a, #2d8da3);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(26, 95, 122, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #b8e0eb, #1a5f7a);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(184, 224, 235, 0.3);
+        }
+        
+        .rationale {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 2px solid #ffd43b;
+            border-radius: 12px;
+            padding: clamp(12px, 2.5vw, 16px);
+            margin-top: clamp(8px, 1.5vw, 12px);
+            display: none;
+        }
+        
+        .rationale.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        
+        .rationale h4 {
+            color: #856404;
+            margin-bottom: clamp(6px, 1.2vw, 10px);
+            display: flex;
+            align-items: center;
+            gap: clamp(6px, 1.2vw, 8px);
+            font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+        }
+        
+        .rationale p {
+            color: #856404;
+            line-height: 1.6;
+            font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stats {
+            display: flex;
+            gap: clamp(8px, 1.5vw, 15px);
+            justify-content: center;
+            margin-top: clamp(4px, 1vw, 10px);
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            background: rgba(255,255,255,0.2);
+            padding: clamp(5px, 1vw, 6px) clamp(8px, 1.8vw, 12px);
+            border-radius: 20px;
+            font-size: clamp(0.7rem, 1.6vw, 0.85rem);
+            white-space: nowrap;
+        }
+        
+        /* Cancel selection button */
+        .cancel-selection {
+            background: linear-gradient(135deg, #e74c3c, #c82333);
+            color: white;
+            margin: 0 auto clamp(10px, 2vw, 15px) auto;
+            display: none;
+        }
+        
+        .cancel-selection:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(220, 53, 69, 0.3);
+        }
+        
+        .cancel-selection.show {
+            display: flex;
+        }
+        
+        /* Study mode controls */
+        .study-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .study-btn {
+            padding: 8px 16px;
+            border: 2px solid #1a5f7a;
+            background: white;
+            color: #1a5f7a;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .study-btn.active {
+            background: #1a5f7a;
+            color: white;
+        }
+        
+        .study-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(26, 95, 122, 0.2);
+        }
+        
+        /* Multiple select instructions */
+        .multiple-select-instructions {
+            text-align: center;
+            color: #e74c3c;
+            font-weight: 500;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👶 Maternal and Child Health Care</h1>
+            <div class="subtitle">Chapter 1 - 44 Questions | Multiple-Select Enabled</div>
+            <div class="stats">
+                <div class="stat">🎯 44 Questions</div>
+                <div class="stat">📖 Detailed Rationales</div>
+                <div class="stat">🔢 Multiple-Answer Questions</div>
+                <div class="stat">↩️ Cancel Wrong Answers</div>
+            </div>
+        </div>
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="flashcard">
+            <div class="study-controls">
+                <button class="study-btn active" id="allQuestionsBtn" onclick="setStudyMode('all')">All Questions</button>
+                <button class="study-btn" id="multipleSelectBtn" onclick="setStudyMode('multiple')">Multiple-Select Only</button>
+                <button class="study-btn" id="singleSelectBtn" onclick="setStudyMode('single')">Single-Select Only</button>
+                <button class="study-btn" id="incorrectBtn" onclick="setStudyMode('incorrect')">Review Incorrect</button>
+            </div>
+            
+            <div class="question-container">
+                <div class="question-icon">?</div>
+                <div class="question" id="question"></div>
+                <div class="multiple-select-indicator" id="multipleSelectIndicator" style="display: none;">Multiple Answers</div>
+            </div>
+            
+            <div class="multiple-select-instructions" id="multipleSelectInstructions" style="display: none;">
+                💡 Select ALL correct answers - This question has multiple correct options
+            </div>
+            
+            <div class="options" id="options"></div>
+            
+            <!-- Cancel Selection Button - Only shows for wrong answers -->
+            <button class="btn cancel-selection" id="cancelBtn" onclick="cancelSelection()">
+                ↩️ Cancel Selection
+            </button>
+            
+            <div class="feedback" id="feedback">
+                <div class="feedback-icon" id="feedbackIcon"></div>
+                <div id="feedbackText"></div>
+            </div>
+            <div class="rationale" id="rationale">
+                <h4>💡 Rationale:</h4>
+                <p id="rationaleText"></p>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <button class="btn btn-secondary" id="prevBtn" onclick="previousCard()">
+                ⬅️ Previous
+            </button>
+            <div class="counter" id="counter">1/44</div>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextCard()">
+                Next ➡️
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "1. When integrating the principles of family-centered care into the birthing process, the nurse would base care upon which belief?",
+                options: [
+                    "Birth is viewed as a medical event.",
+                    "Families are unable to make informed choices due to stress.",
+                    "Birth results in changes in relationships.",
+                    "Families require little information to make appropriate decisions for care."
+                ],
+                correct: 2,
+                rationale: "Family-centered care is based on the following principles: Birth affects the entire family, and relationships will change; birth is viewed as a normal, healthy event in the life of the family; and families are capable of making decisions about their own care if given adequate information and professional support."
+            },
+            {
+                question: "2. The nurse is working with a group of community health members to develop a plan to address the special health needs of women. The group would design educational programs to address which priority condition?",
+                options: [
+                    "Smoking",
+                    "Heart disease",
+                    "Diabetes",
+                    "Cancer"
+                ],
+                correct: 1,
+                rationale: "The group needs to address cardiovascular disease, the number one cause of death in women regardless of racial or ethnic group. Smoking is related to heart disease and the development of cancer. However, heart disease and cancer can occur in any woman regardless of her smoking history. Cancer is the second leading cause of death, with women having a one in three lifetime risk of developing cancer. Diabetes is another important health condition that can affect women. However, it is not the major health problem that heart disease is."
+            },
+            {
+                question: "3. A nurse is conducting an orientation program for a group of newly hired nurses. As part of the program, the nurse is reviewing the issue of informed consent. The nurse determines that the teaching was effective when the group identifies which situation as a violation of informed consent?",
+                options: [
+                    "Performing a procedure on a 15-year-old without parental consent",
+                    "Serving as a witness to the signature process on an operative permit",
+                    "Asking whether the client understands what she is signing following receiving education",
+                    "Getting verbal consent over the phone for an emergency procedure from the spouse of an unconscious woman"
+                ],
+                correct: 0,
+                rationale: "In most states, only clients over the age of 18 can legally provide consent for health care. Serving as a witness to the signature process, asking whether the client understands what she is signing, and getting verbal consent over the phone for emergency procedures are all key to informed consent and are not violations."
+            },
+            {
+                question: "4. A pregnant woman is to undergo an invasive procedure to evaluate the status of her fetus. To ensure informed consent, which action would be the priority responsibility of the nurse providing care to this woman?",
+                options: [
+                    "Asking relevant questions to determine the client's understanding",
+                    "Providing a detailed description of the risks and benefits of the procedure",
+                    "Explaining the exact steps that will occur during the procedure",
+                    "Offering suggestions for alternative options for treatment"
+                ],
+                correct: 0,
+                rationale: "The nurse's responsibilities related to informed consent include: Ensuring the consent form is completed with signatures from the client; serving as a witness to the signature process; and determining whether the client understands what she is signing by asking her pertinent questions. The physician, advanced practice nurse, or midwife is responsible for informing the client about the procedure and obtaining consent by providing a detailed description of the procedure or treatment, its potential risks and benefits, and alternative methods available."
+            },
+            {
+                question: "5. A 9-month-old with glaucoma requires surgery. The infant's parents are divorced. To obtain informed consent, which action would be most appropriate?",
+                options: [
+                    "Contacting the father for informed consent",
+                    "Obtaining informed consent from the mother",
+                    "Seeking a court ruling on the course of care",
+                    "Determining sole or joint custody by the parents"
+                ],
+                correct: 3,
+                rationale: "The most appropriate action would be to determine legal custody by court decree. If the parents have joint custody, then either parent may give consent, but it is always best to have consent given by both parents. The parent with only physical custody may give consent for emergency care. The last resort is getting a court ruling; usually this is not necessary unless the parents disagree about the care of the child."
+            },
+            {
+                question: "6. Which statement made by a nursing student would best indicate that her education on family-centered care was fully understood?",
+                options: [
+                    "\"Childbirth affects the entire family, and relationships will change.\"",
+                    "\"Families are usually not capable of making health care decisions for themselves, especially in stressful situations.\"",
+                    "\"Mothers are the only family member affected by childbirth.\"",
+                    "\"Since childbirth is a medical procedure, it may affect everyone.\""
+                ],
+                correct: 0,
+                rationale: "Childbirth affects the entire family, and relationships will change. Childbirth is viewed as a normal life event, not a medical procedure. Families are very capable of making health care decisions about their own care with proper information and support."
+            },
+            {
+                question: "7. Which aspect of client wellness has not been a focus of health during the 21st century?",
+                options: [
+                    "Disease prevention",
+                    "Health promotion",
+                    "Wellness",
+                    "Analysis of morbidity and mortality"
+                ],
+                correct: 3,
+                rationale: "The focus on health has shifted to disease prevention, health promotion, and wellness. In the last century, much of the focus was on analyzing morbidity and mortality rates."
+            },
+            {
+                question: "8. A nurse is planning a continuum of care for a client during pregnancy, labor, and childbirth. What is the most important factor in enhancing the birthing experience?",
+                options: [
+                    "Adhering to strict specific routines",
+                    "Involving a pediatric physician",
+                    "Educating the client about the importance of a support person",
+                    "Assigning several nurses as a support team"
+                ],
+                correct: 2,
+                rationale: "Educating the client about the importance of a support person during labor and delivery has been shown to improve and enhance the birthing experience."
+            },
+            {
+                question: "9. The nurse is administering a number of therapeutic interventions for neonates, infants, and children on the pediatric unit. Which intervention contributes to an increase in chronic illness seen in early childhood?",
+                options: [
+                    "Administering antibiotics to prevent lethal infections",
+                    "Vaccinating children to prevent childhood diseases",
+                    "Using mechanical ventilation for premature infants",
+                    "Using corticosteroids as a treatment for asthma"
+                ],
+                correct: 2,
+                rationale: "Using mechanical ventilation and medications to foster lung development in premature infants increases their survival rate. Yet the infants who survive are often faced with myriad chronic illnesses. Administering antibiotics to prevent lethal infections, vaccinating children to prevent childhood diseases, and using corticosteroids as a treatment for asthma may cause side effects, but do not contribute to chronic illness in children."
+            },
+            {
+                question: "10. The nurse is reviewing a copy of the U.S. Surgeon General's Report, Healthy People 2020. Which nursing action best reflects the nurse fostering this health care agenda?",
+                options: [
+                    "The nurse signs up for classes to obtain an advanced degree in nursing.",
+                    "The nurse volunteers at a local health care clinic providing free vaccinations for low-income populations.",
+                    "The nurse performs an in-service on basic hospital equipment for student nurses.",
+                    "The nurse compiles nursing articles on evidence-based practices in nursing to present at a hospital training seminar."
+                ],
+                correct: 1,
+                rationale: "Healthy People 2020 is a comprehensive health promotion and disease prevention agenda that is working toward improving the quantity and quality of life for all Americans. Overarching goals are to eliminate preventable disease, disability, injury, and premature death; achieve health equity, eliminate disparities, and improve the health of all groups; create physical and social environments that promote good health; and promote healthy development and behaviors across every stage of life. Volunteering at a local health care clinic directly reflects the goal of improving the health of all groups of people. Signing up for classes, performing in-services on equipment, and compiling nursing articles on evidence-based practices in nursing are all worthwhile activities that foster health care delivery, but are not as directly linked to the agenda of promoting health in the community."
+            },
+            {
+                question: "11. When assessing a family for barriers to health care, the nurse documents the psychosocial barriers. What is an example of this type of health care deficit?",
+                options: [
+                    "Academic difficulties",
+                    "Respiratory illness",
+                    "Poor sanitation",
+                    "Inherited diseases"
+                ],
+                correct: 0,
+                rationale: "Environmental and psychosocial factors are now an identified area of concern in children. They include academic differences, complex psychiatric disorders, self-harm and harm to others, use of firearms, hostility at school, substance use disorder, HIV/AIDS, and adverse effects of the media. Respiratory illness and inherited diseases are health problems, and poor sanitation is an environmental factor."
+            },
+            {
+                question: "12. When integrating the principles of family-centered care, the nurse would include which concept?",
+                options: [
+                    "Parents want nurses to make decisions about their child's treatment.",
+                    "Families are unable to make informed choices.",
+                    "People have taken increased responsibility for their own health.",
+                    "Families require little information to make appropriate decisions."
+                ],
+                correct: 2,
+                rationale: "Due to the influence of managed care, the focus on prevention, better education, and technological advances, people have taken increased responsibility for their own health. Parents now want information about their child's illness, to participate in making decisions about treatment, and to accompany their children to all health care situations."
+            },
+            {
+                question: "13. The nurse is caring for a 2-week-old girl with a metabolic disorder. Which activity would deviate from the characteristics of family-centered care?",
+                options: [
+                    "Softening unpleasant information or prognoses",
+                    "Evaluating and changing the nursing plan of care",
+                    "Collaborating with the child and family as equals",
+                    "Showing respect for the family's beliefs and wishes"
+                ],
+                correct: 0,
+                rationale: "Family-centered care requires that the nurse provide open and honest information to the child and family. It is inappropriate to soften unpleasant information or prognoses. Evaluating and changing the nursing plan of care to fit the needs of the child and family, collaborating with them as equals, and showing respect for their beliefs and wishes are guidelines for family-centered care."
+            },
+            {
+                question: "14. The nurse is caring for a 14-year-old girl with multiple health problems. Which activity would best reflect evidence-based practice by the nurse?",
+                options: [
+                    "Following blood pressure monitoring recommendations",
+                    "Determining how often the vital signs are monitored",
+                    "Using hospital protocol for ordering diagnostic tests",
+                    "Deciding the prescribed medication dose"
+                ],
+                correct: 0,
+                rationale: "Using hospital protocol for ordering a diagnostic test, determining how often the vital signs are monitored, and deciding the medication dose ordered would be the health care provider's responsibility. However, following blood pressure monitoring recommendations would be part of evidence-based practice reflected in the nursing care delivered."
+            },
+            {
+                question: "15. The nurse is functioning in the primary role to care for a 12-year-old boy with metastatic cancer in the liver. Which activity is typical of advocacy?",
+                options: [
+                    "Instructing parents about proper home care",
+                    "Educating the family about choices they have",
+                    "Telling parents about clinical guidelines",
+                    "Teaching the family about types of cancers"
+                ],
+                correct: 1,
+                rationale: "Educating the family about choices they have regarding therapies for the cancer in the child's liver is an example of advocacy, in which the nurse advances the interests of the child and family by informing them of options and assisting them to make informed decisions. Telling parents about proper home care, clinical guidelines, and the types of cancers are all done in the primary role of educator."
+            },
+            {
+                question: "16. The nurse is caring for a 14-year-old boy with a growth hormone deficiency. Which action best reflects using the nursing process to provide quality care to children and their families?",
+                options: [
+                    "Reviewing the effectiveness of interventions",
+                    "Questioning the facility standards for care",
+                    "Earning continuing education credits",
+                    "Ensuring reasonable costs for care provided"
+                ],
+                correct: 0,
+                rationale: "The nursing process is used to care for the child and family during health promotion, maintenance, restoration, and rehabilitation. It is a problem-solving method based on the scientific method that allows nursing care to be planned and implemented in a thorough, organized manner to ensure quality and consistency of care. The nursing process is applicable to all health care settings and consists of five steps: assessment, nursing diagnosis, outcome identification and planning, implementation, and outcome evaluation. Reviewing the effectiveness of interventions is related to outcome evaluation in the nursing process. Even though the three remaining answer options are valuable in ensuring quality of care in health care facilities, they do not involve the direct care of the child and family using the nursing process."
+            },
+            {
+                question: "17. A preschool child is scheduled to undergo a diagnostic test. Which action by the nurse would violate a child's bill of health care rights?",
+                options: [
+                    "Arranging for her mother to be with her",
+                    "Telling the child the test will not hurt",
+                    "Assuring the child that the test will be done quickly",
+                    "Introducing the child to the lab technicians"
+                ],
+                correct: 1,
+                rationale: "Telling the child the test will not hurt lacks veracity. It is not a lie, but it does not honor the child's right to be educated honestly about his or her health care. Arranging for the mother to be with the child, assuring the child that the test will be done quickly, and introducing the child to the lab technicians are actions that honor the child's bill of health care rights."
+            },
+            {
+                question: "18. The pediatric nurse knows that the children being treated are considered minors. Which statement accurately describes the regulations related to consent for medical treatment?",
+                options: [
+                    "Children older than age 16 can provide their own consent for, or refusal of, medical procedures.",
+                    "A guardian ad litem may be appointed by the parents to serve to protect the child's best interests.",
+                    "Parents ultimately are the decision makers regarding medical treatment for their children younger than the age of 18.",
+                    "When divorce occurs, the parent with whom the child is living on a daily basis will be granted custody of the child."
+                ],
+                correct: 2,
+                rationale: "Parents ultimately are the decision makers for their children. Generally, only persons over the age of majority (18 years of age) can legally provide consent for health care. Minors (children younger than 18 years of age) generally require adult guardians to act on their behalf. Biological or adoptive parents are usually considered to be the child's legal guardian. When divorce occurs, one or both parents may be granted custody of the child. In certain cases (such as child violence or neglect, or during foster care), a guardian ad litem may be appointed by the courts. This person generally serves to protect the child's best interests."
+            },
+            {
+                question: "19. The nurse is caring for a 12-year-old child hospitalized for internal injuries following a motor vehicle accident. For which medical treatment would the nurse ensure that an informed consent is completed beyond the one signed at admission?",
+                options: [
+                    "Diagnostic imaging",
+                    "Cardiac monitoring",
+                    "Blood testing",
+                    "Spinal tap"
+                ],
+                correct: 3,
+                rationale: "Most care given in a health care setting is covered by the initial consent for treatment signed when the child becomes a client at that office or clinic or by the consent to treatment signed upon admission to the hospital or other inpatient facility. Certain procedures, however, require a specific process of informed consent, including major and minor surgery; invasive procedures such as lumbar puncture or bone marrow aspiration; treatments placing the child at higher risk, such as chemotherapy or radiation therapy; procedures or treatments involving research; photography involving children; and applying restraints to children."
+            },
+            {
+                question: "20. A child needs a consent form signed for a minor surgical procedure. Which statement accurately describes the responsibilities of the health care providers when obtaining the consent?",
+                options: [
+                    "The physician is responsible for ensuring that the consent form is completed with signatures from the parents or legal guardians.",
+                    "The physician is responsible for serving as a witness to the signature process.",
+                    "The nurse is responsible for informing the child and family about the procedure and obtaining consent.",
+                    "The nurse is responsible for determining that the parents or legal guardians understand what they are signing by asking them pertinent questions."
+                ],
+                correct: 3,
+                rationale: "The nurse's responsibility related to informed consent includes the following: determining that the parents or legal guardians understand what they are signing by asking them pertinent questions, ensuring that the consent form is completed with signatures from the parents or legal guardians, and serving as a witness to the signature process. The physician or advanced practitioner providing or performing the treatment and/or procedure is responsible for informing the child and family about the procedure and obtaining consent by providing a detailed description of the procedure or treatment, the potential risks and benefits, and alternative methods available."
+            },
+            {
+                question: "21. The nurse is caring for a child brought to the emergency department by a babysitter. The child needs an emergency appendectomy and the parents cannot be contacted. What would be the nurse's best response to this situation?",
+                options: [
+                    "Have the babysitter sign the consent form even if she does not have signed papers to do so.",
+                    "Have the primary care physician for the child sign the consent form.",
+                    "Document failed attempts to obtain consent to allow emergency care.",
+                    "Delay medical care until the child's next of kin can be contacted."
+                ],
+                correct: 2,
+                rationale: "Health care providers can provide emergency treatment to a child without consent if they have made reasonable attempts to contact the child's parent or legal guardian. If the parent is not available, then the person in charge may give consent for emergency treatment if that person has a signed form from the parent or legal guardian allowing him or her to do so. During an emergency situation, a verbal consent via the telephone may be obtained. In urgent or emergent situations, appropriate medical care never should be delayed or withheld due to an inability to obtain consent."
+            },
+            {
+                question: "22. The nurse knows that the emancipated minor is considered to have the legal capacity of an adult and may make his or her own health care decisions. Which child would potentially be considered an emancipated minor?",
+                options: [
+                    "A minor with financial independence who is living with his parents",
+                    "A minor who is pregnant",
+                    "A child older than 13 years of age who asks for emancipation",
+                    "A minor who puts his or her medical decisions in writing"
+                ],
+                correct: 1,
+                rationale: "Emancipation may be considered in any of the following situations, depending on the state's laws: membership in a branch of the armed services, marriage, court-determined emancipation, financial independence and living apart from parents, college attendance, pregnancy, mother younger than 18 years of age, and a runaway."
+            },
+            {
+                question: "23. After describing the procedure and medical necessity, the nurse asks a 14-year-old child to assent to a skin graft. Which statement accurately describes the requirements for this type of assent?",
+                options: [
+                    "The age of assent occurs at 12 years old.",
+                    "It is not necessary to obtain assent from a minor for a procedure.",
+                    "A minor can dissent to a procedure but his or her wishes are not binding.",
+                    "In some cases, such as cases of significant morbidity or mortality, dissent may need to be overridden."
+                ],
+                correct: 3,
+                rationale: "Assent means agreeing to something. In pediatric health care, the term assent refers to the child's participation in the decision-making process about health care. In some cases, such as cases of significant morbidity or mortality, dissent may need to be overridden. The age of assent depends on the child's developmental level, maturity, and psychological state. The converse of assent, dissent (disagreeing with the treatment plan), when given by an adolescent 13 to 17 years of age, is considered binding in some states."
+            },
+            {
+                question: "24. The family is the basic unit of society. Which statement correctly illustrates the importance of this concept related to how society functions?",
+                options: [
+                    "Healthy, well-functioning families provide members of all ages with fulfilling, supporting relationships.",
+                    "The family serves as a place that encourages members to autonomously function in pursuit of personal pleasures.",
+                    "Society functions best when families determine how they will interface with others without having to deal with the overall consequences.",
+                    "Work is an important part of family function but is not necessary for success if one member can fulfill multiple roles."
+                ],
+                correct: 0,
+                rationale: "The family is the basic unit of society. In order for this to work well, members of the family must work together. Families make a central contribution to enhance the quality of our society. Families must consider how their actions will impact others, and one member cannot fulfill all roles within the family."
+            },
+            {
+                question: "25. A nursing group is examining their hospital's maternal outcomes for the previous 5 years. Which identified factors have contributed to the decline in the maternal mortality rate? Select all that apply.",
+                options: [
+                    "Increased participation of women in prenatal care",
+                    "Use of ultrasound to detect disorders",
+                    "Increased use of anesthesia with birth",
+                    "Closer monitoring for complications associated with hypertension of pregnancy",
+                    "Better management of hemorrhage and infection"
+                ],
+                correct: [0, 1, 3, 4],
+                rationale: "The following factors have contributed to the decline in the maternal mortality rate: increased participation of women in prenatal care; greater detection of disorders such as ectopic pregnancy or placenta previa; prevention of related complications through the use of ultrasound; increased control of complications associated with hypertension of pregnancy; and decreased use of anesthesia with birth."
+            },
+            {
+                question: "26. The nurse is working with a group of community health members to develop a plan to address the special health needs of women. Which educational program would the group most likely identify as the priority?",
+                options: [
+                    "risk reduction strategies for diabetes",
+                    "methods for smoking cessation",
+                    "ways to adopt a heart-healthy lifestyle",
+                    "importance of cancer screening and early detection"
+                ],
+                correct: 2,
+                rationale: "The group needs to address cardiovascular disease, the number one cause of death in women regardless of racial or ethnic group. Thus, education for adopting a heart-healthy lifestyle would be the priority. Smoking is related to heart disease and the development of cancer. However, heart disease and cancer can occur in any woman regardless of her smoking history. Cancer is the second leading cause of death, with women having a one in three lifetime risk of developing cancer. Diabetes is another important health condition that can affect women. However, it is not the major health problem that heart disease is, and thus educational programs focusing on smoking cessation, cancer screening and early detection, and diabetes risk reduction would be lesser priorities."
+            },
+            {
+                question: "27. A perinatal nurse is interviewing a group a women in the community about health care services. Assessment of these services reveals that many of them are being underutilized. Which statement from the women would assist the nurse in identifying potential reasons for this underutilization? Select all that apply.",
+                options: [
+                    "\"The services are hard to get to by public transportation.\"",
+                    "\"The clinic is only open during the morning hours.\"",
+                    "\"The staff seems to look down on us when we do come in.\"",
+                    "\"There are staff there that can speak our language.\"",
+                    "\"You need insurance to go to the clinic.\""
+                ],
+                correct: [0, 1, 2, 4],
+                rationale: "Access to care can be jeopardized by lower incomes and greater responsibilities when juggling work and family. Lack of finances or transportation, geographic misdistribution of health care providers, no babysitters, language or cultural barriers, distrust of health care providers, inconvenient clinic hours, and the poor attitudes of health care workers often discourage clients from seeking health care. Having staff that speak the language of the client population would be helpful in encouraging clients to use the services."
+            },
+            {
+                question: "28. A nurse is preparing a class discussion on cardiovascular disease in women. When discussing the priority risk factors for this disease, which would the nurse least likely include? Select all that apply.",
+                options: [
+                    "Menopause",
+                    "Diabetes diagnosis",
+                    "Weight cycling",
+                    "Gender",
+                    "Age"
+                ],
+                correct: [3, 4],
+                rationale: "CVD is the leading cause of death in women. Risk factors of CVD differ between men and women with menopause, diabetes, and repeated weight losses and gains increasing the risk for coronary morbidity and mortality in women. Yo-yo dieting or yo-yo effect, also known as weight cycling is a major risk factor. Gender and age are not major risk factors and should not be considered in this list."
+            },
+            {
+                question: "29. A nurse is preparing a class discussion on the clinical manifestations of a heart attack observed in women. Which symptoms would the nurse include as key assessment data? Select all that apply.",
+                options: [
+                    "syncope",
+                    "unusual fatigue",
+                    "sleep disturbances",
+                    "arm pain",
+                    "extreme hunger"
+                ],
+                correct: [1, 2, 3],
+                rationale: "Nurses need to go beyond the obvious crushing chest pain textbook symptom that indicates heart attack in men. Clinical manifestations of a heart attack observed in women include nausea, dizziness, irregular heartbeat, unusual fatigue, sleep disturbances, indigestion, anxiety, shortness of breath, pain or discomfort in one or both arms, and weakness."
+            },
+            {
+                question: "30. A nurse is preparing a breast cancer presentation for a health forum. Which fact would the nurse expect to address in this presentation?",
+                options: [
+                    "Breast cancer is more advanced in Black women when found.",
+                    "Black women have the BRCA1 and BRCA2 gene.",
+                    "More Hispanic women smoke, which increases their risk.",
+                    "White women respond better to breast cancer treatment."
+                ],
+                correct: 0,
+                rationale: "White women get breast cancer at a higher rate than Black women; however, Black women are more likely to die because they get breast cancer before 40 years of age, cancer is more advanced when found, and survival at every cancer stage is worse among Black women. Black women are not at greater risk due to the BRCA1 or BRCA2 genes that cause breast cancer. There is no evidence that Hispanic women smoke more, placing them at risk. White women do not respond better to cancer treatment."
+            },
+            {
+                question: "31. A nurse is making a presentation at a parenting class dealing with divorce. A participant asks the nurse, \"How should a parent handle telling the children about a divorce?\" Which statements are the most helpful? Select all that apply.",
+                options: [
+                    "\"Tell your children about the divorce and the reasons for it.\"",
+                    "\"Reassure your children that the divorce is not their fault.\"",
+                    "\"Make sure your children are aware of the potential financial issues.\"",
+                    "\"Let them know they can decide how the future family will look.\"",
+                    "\"Inform them in advance of someone moving out of the family home.\"",
+                    "\"Routines, rules, and discipline can be minimized until a later time.\""
+                ],
+                correct: [0, 1, 4],
+                rationale: "Rules for divorcing parents suggest to tell the children about the divorce and the reasons for the divorce in terms that they can understand; reassure the children that the divorce is not their fault; inform the children about the family structure after the divorce; inform them in advance of any changes in the household (i.e., someone moving out); do not discuss money or finances with your children; and maintain rules and routines."
+            },
+            {
+                question: "32. A nurse is preparing for a presentation on parenting at a local school. Which information would the nurse include when describing the results of an authoritarian parent? Select all that apply.",
+                options: [
+                    "The child will have lower self-esteem.",
+                    "The child will have increased feeling of security.",
+                    "Children will have higher achievements.",
+                    "An increase in aggression may be a result.",
+                    "The child will have increased social skills.",
+                    "There is a greater childhood happiness."
+                ],
+                correct: [0, 3],
+                rationale: "This parenting style is associated with negative effects on self-esteem, happiness and social skills, increased aggression, and defiance. The child will not feel more secure as the parent is always in control. It will not result in higher achievements or an increase in social skills."
+            },
+            {
+                question: "33. A client asks the nurse, \"What is a fetal death?\" What is the nurse's best response?",
+                options: [
+                    "\"Fetal deaths occur later in pregnancy after 20 weeks' gestation.\"",
+                    "\"It refers to the intrauterine fetal death at any time during pregnancy.\"",
+                    "\"Fetal deaths occur earlier in pregnancy before 20 weeks' gestation.\"",
+                    "\"Fetal death occurs only at the birth of the newborn.\""
+                ],
+                correct: 1,
+                rationale: "Fetal death refers to the spontaneous intrauterine death of a fetus at any time during pregnancy. Fetal deaths later in pregnancy (after 20 weeks of gestation) are referred to as stillbirths, and deaths earlier than 20 weeks are referred to as a miscarriage."
+            },
+            {
+                question: "34. Which factors are causes of the high infant mortality rate? Select all that apply.",
+                options: [
+                    "postmaturity",
+                    "low birth weight",
+                    "sudden infant death syndrome",
+                    "cardiac complications",
+                    "viral infections",
+                    "necrotizing enterocolitis"
+                ],
+                correct: [1, 2, 5],
+                rationale: "The main causes of early infant death in the United States include problems occurring at birth or shortly thereafter, such as prematurity, low birth weight, congenital and chromosomal anomalies, sudden infant death syndrome, respiratory distress syndrome, unintentional injuries, bacterial sepsis, and necrotizing enterocolitis."
+            },
+            {
+                question: "35. A nurse is preparing for a health promotion presentation for new mothers. Which topics would be appropriate for the nurse to include in the presentation? Select all that apply.",
+                options: [
+                    "Breastfeeding encouragement",
+                    "Proper infant sleep position",
+                    "Infants in smoke-free environments",
+                    "How to swaddle their infants",
+                    "How to bed share with their infants"
+                ],
+                correct: [0, 1, 2],
+                rationale: "Health promotion strategies can significantly improve an infant's health and chances of survival. Breastfeeding has been shown to reduce rates of infection in infants and to improve their long-term health. Emphasizing the importance of placing an infant on his or her back to sleep will reduce the incidence of sudden infant death syndrome (SIDS). Parents/partners should not share a bed with an infant younger than 12 weeks old and should avoid exposing the infant to tobacco smoke. Encouraging mothers to join support groups to prevent postpartum depression will improve the health of both mothers and their infants. Swaddling an infant and bed sharing is discouraged due to SIDS."
+            },
+            {
+                question: "36. A client asks the nurse about her potential risk factors for breast cancer. Which risks would be important for the nurse to include in the response? Select all that apply.",
+                options: [
+                    "Oral contraceptive use",
+                    "Age when children were born",
+                    "Irregularities in menstruation",
+                    "Smoking",
+                    "Obesity"
+                ],
+                correct: [0, 2, 4],
+                rationale: "A positive family history of breast cancer, aging, and irregularities in the menstrual cycle at an early age are major risk factors for breast cancer. Other risk factors include excess weight or obesity, not having children, oral contraceptive use, excessive alcohol consumption, a high-fat diet, sedentary lifestyle, and long term use of hormones. Smoking is not a major risk factor for breast cancer, although it is considered. The age of the mother when children are born is not a risk factor."
+            },
+            {
+                question: "37. A public health nurse is preparing a presentation for a parenting class with the focus on childhood discipline. Which principles of childhood discipline would the nurse expect to emphasize? Select all that apply.",
+                options: [
+                    "The use of punishment will reduce or eliminate undesirable behaviors.",
+                    "Discipline methods should ensure the preservation of the child's self-esteem.",
+                    "Time-out technique for discipline is no longer acceptable.",
+                    "Positive reinforcement will increase desirable behaviors.",
+                    "Maintain a positive, supportive, nurturing parent-child relationship."
+                ],
+                correct: [1, 3, 4],
+                rationale: "Discipline should focus on the development of the child while ensuring to preserve the child's self-esteem and dignity. The American Academy of Pediatrics suggests three strategies for effective discipline: maintaining a positive, supportive, nurturing caregiver--child relationship; using positive reinforcement to increase desirable behaviors; and removing positive reinforcements or using punishment to reduce or eliminate undesirable behaviors. When using time-out, use 1 minute per year of the child's age (a 3-year-old would have time-out for 3 minutes). Do not exceed 5 minutes."
+            },
+            {
+                question: "38. When teaching a parenting class on childhood discipline, the nurse is asked by a parent, \"How long do I place my child in time-out?\" How should the nurse best respond?",
+                options: [
+                    "\"Use the amount of time it takes to elicit a behavior change.\"",
+                    "\"Use 1 minute per year of age, but do not exceed 5 minutes.\"",
+                    "\"Use as much time as is needed to control the behavior.\"",
+                    "\"Use 1 minute per year of the child's age as needed.\""
+                ],
+                correct: 1,
+                rationale: "Another form of discipline is extinction, which focuses on reducing or eliminating the positive reinforcement for inappropriate behavior. Examples are \"time-out.\" When using time-out, use 1 minute per year of the child's age (a 3-year-old would have time-out for 3 minutes). Do not exceed 5 minutes."
+            },
+            {
+                question: "39. After teaching a group of parents on childhood discipline, the nurse understands that which statement, made by a parent, demonstrates an understanding of spanking as a form of discipline?",
+                options: [
+                    "\"When responding to inappropriate behavior it is OK to lightly spank.\"",
+                    "\"Use a combination of spanking along with other methods of discipline.\"",
+                    "\"Use spanking as a last resort when time-out has failed.\"",
+                    "\"Use methods other than spanking to respond to inappropriate behavior.\""
+                ],
+                correct: 3,
+                rationale: "Some research says spanking provides children with a model of aggressive behavior as a solution for conflict, is associated with increased aggression in children, and can lead to an altered parent--child relationship. Because of the negative consequences of spanking, and because it has been shown to be no more effective than other methods for managing inappropriate behavior, it is recommended that parents use methods other than spanking to respond to inappropriate behavior."
+            },
+            {
+                question: "40. A public health nurse visits the home of a young toddler. What aspect of the home environment would the nurse expect to address with the parents?",
+                options: [
+                    "The presence of power cords plugged into capped outlets",
+                    "Cartoons playing on a television in the child's room",
+                    "The family dog is present in the house during the visit",
+                    "The presence of pots on the stove with handles pointing toward back"
+                ],
+                correct: 1,
+                rationale: "The nurse is encouraged to ask questions regarding the amount of recreational screen time and if the child has a television or Internet-connected device in his or her bedroom. The American Academy of Pediatrics discourages any screen media before the age of 2. The nurse would question why the TV is being used in the child's room. The family dog may be a threat to observe during the visit, but having a TV in the child's room indicates that it is being exposed to earlier than advised screen time. Pot handles are in the appropriate position. Cords are plugged into capped outlets, which is safe."
+            },
+            {
+                question: "41. The nurse notes that an older adult client receives only one visitor and asks the client if family members could be called. The client states, \"I consider her to be all of my family.\" What would the nurse consider in responding to the client?",
+                options: [
+                    "The nurse could encourage the client to reconnect with other family members.",
+                    "The client defines who is and who is not part of the family without undue influence.",
+                    "The nurse realizes individuals exist without a family and do not often adopt substitutes.",
+                    "Family is more important to those individuals with a large number of family members."
+                ],
+                correct: 1,
+                rationale: "It is important for nurses to remain neutral to all they hear and see in order to enhance trust and maintain open communication lines with all family members. Nurses need to remember that clients are experts of their own health and can define their own family."
+            },
+            {
+                question: "42. The nurse working in a maternity clinic suspects that a client and her children are in a violent relationship. While waiting for test results, the nurse decides to teach the client about intimate partner violence. What would be the best rationale for the nurse's decision?",
+                options: [
+                    "The nurse knows that the woman may be weak and controlled by her partner.",
+                    "The nurse has a legal responsibility to protect clients.",
+                    "The nurse understands there is an ethical responsibility to protect clients.",
+                    "The nurse knows that children exposed to family violence are likely to be victims of abuse."
+                ],
+                correct: 3,
+                rationale: "Children exposed to family violence are more likely to be physically, sexually, or emotionally abused themselves. Children have died from family violence and neglect when no one has intervened on their behalf. Children who are exposed to stressors such as family violence or who are victims of childhood violence or neglect are at high risk for short- and long-term problems. Witnessing and being exposed to violence in childhood results in a higher tolerance, and greater use, of violence as an adult. The nurse may feel an ethical responsibility towards clients, but the nurse does not have a legal responsibility to protect clients. Women being the weaker sex is a myth."
+            },
+            {
+                question: "43. A public health nurse is developing programs to educate parents on infant mortality. Which complications would the nurse include in the education? Select all that apply.",
+                options: [
+                    "Tricuspid atresia",
+                    "39-week gestation birth",
+                    "3,6 kg birth weight",
+                    "Anencephalus",
+                    "Spina bifida"
+                ],
+                correct: [0, 3, 4],
+                rationale: "The main causes of early infant death in this country include problems occurring at birth or shortly thereafter. These include prematurity, low birth weight, congenital anomalies, sudden infant death syndrome (SIDS), and respiratory distress syndrome. A pregnancy at 39 weeks would be considered a term pregnancy. A birth weight of 3.6 kg would be considered appropriate."
+            },
+            {
+                question: "44. The pediatric nurse would be participating in the role of advocate when completing which action?",
+                options: [
+                    "Instructing parents on the side effects of vaccinations they are requesting for their child",
+                    "Contributing input on a task force with the aim to reduce the rate of mortality of infants and children",
+                    "Teaching parents to keep their prescribed medication safely out of reach of children",
+                    "Explaining to parents the reason for each medication their child was recently prescribed"
+                ],
+                correct: 1,
+                rationale: "The role of advocacy is being fulfilled when the nurse works to safeguard and advance the interest of children and infants through many means, including contributing to the learning and application of a task force aimed at reducing infant and children mortality. The actions of instructing about side effects, explaining the purposes of medications, and teaching about medication safety would fall under the role of educator."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let selectedOption = null;
+        let score = 0;
+        let answers = Array(questions.length).fill(null);
+        let incorrectQuestions = [];
+        let studyMode = 'all'; // 'all', 'multiple', 'single', 'incorrect'
+        let filteredQuestions = [...questions];
+
+        function setStudyMode(mode) {
+            studyMode = mode;
+            
+            // Update button states
+            document.querySelectorAll('.study-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(mode + 'Btn').classList.add('active');
+            
+            // Filter questions based on mode
+            switch(mode) {
+                case 'all':
+                    filteredQuestions = [...questions];
+                    break;
+                case 'multiple':
+                    filteredQuestions = questions.filter(q => Array.isArray(q.correct) && q.correct.length > 1);
+                    break;
+                case 'single':
+                    filteredQuestions = questions.filter(q => !Array.isArray(q.correct) || q.correct.length === 1);
+                    break;
+                case 'incorrect':
+                    filteredQuestions = questions.filter((_, index) => incorrectQuestions.includes(index));
+                    if (filteredQuestions.length === 0) {
+                        alert('No incorrect questions to review yet!');
+                        filteredQuestions = [...questions];
+                    }
+                    break;
+            }
+            
+            currentQuestion = 0;
+            loadQuestion();
+        }
+
+        function isMultipleSelectQuestion(question) {
+            return Array.isArray(question.correct) && question.correct.length > 1;
+        }
+
+        function loadQuestion() {
+            if (filteredQuestions.length === 0) {
+                document.getElementById('question').textContent = "No questions available for the selected study mode.";
+                document.getElementById('options').innerHTML = '';
+                document.getElementById('counter').textContent = `0/0`;
+                return;
+            }
+
+            const question = filteredQuestions[currentQuestion];
+            const originalIndex = questions.indexOf(question);
+            
+            document.getElementById('question').textContent = question.question;
+            document.getElementById('counter').textContent = `${currentQuestion + 1}/${filteredQuestions.length}`;
+            
+            // Update progress bar
+            const progress = ((currentQuestion + 1) / filteredQuestions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            // Show/hide multiple select indicators
+            const isMultiple = isMultipleSelectQuestion(question);
+            document.getElementById('multipleSelectIndicator').style.display = isMultiple ? 'block' : 'none';
+            document.getElementById('multipleSelectInstructions').style.display = isMultiple ? 'block' : 'none';
+            
+            // Load options
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.innerHTML = `
+                    <div class="option-letter">${String.fromCharCode(65 + index)}</div>
+                    <div class="option-text">${option}</div>
+                `;
+                optionElement.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Reset feedback and rationale
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('rationale').className = 'rationale';
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            document.getElementById('nextBtn').textContent = currentQuestion === filteredQuestions.length - 1 ? 'Finish ➡️' : 'Next ➡️';
+            
+            // Check if we have a stored answer for this question
+            const storedAnswer = answers[originalIndex];
+            document.getElementById('nextBtn').disabled = storedAnswer === null || storedAnswer === undefined;
+            
+            // Reset cancel button visibility
+            document.getElementById('cancelBtn').classList.remove('show');
+            
+            // If this question was already answered, show the answer
+            if (storedAnswer !== null && storedAnswer !== undefined) {
+                if (Array.isArray(storedAnswer)) {
+                    // Multiple selection question
+                    storedAnswer.forEach(index => {
+                        selectOption(index, true);
+                    });
+                } else {
+                    // Single selection question
+                    selectOption(storedAnswer, true);
+                }
+            }
+        }
+
+        function selectOption(index, fromMemory = false) {
+            const question = filteredQuestions[currentQuestion];
+            const originalIndex = questions.indexOf(question);
+            
+            // Check if this is a multiple selection question
+            if (isMultipleSelectQuestion(question)) {
+                // Multiple selection logic
+                if (!fromMemory) {
+                    if (!answers[originalIndex]) {
+                        answers[originalIndex] = [];
+                    }
+                    
+                    const optionIndex = answers[originalIndex].indexOf(index);
+                    if (optionIndex === -1) {
+                        answers[originalIndex].push(index);
+                    } else {
+                        answers[originalIndex].splice(optionIndex, 1);
+                    }
+                }
+                
+                highlightSelectedOptions();
+                showFeedbackForMultiple();
+                
+                // Enable next button if at least one option is selected
+                document.getElementById('nextBtn').disabled = !answers[originalIndex] || answers[originalIndex].length === 0;
+                return;
+            }
+            
+            // Single selection logic
+            if (selectedOption !== null && !fromMemory) return;
+            
+            if (!fromMemory) {
+                selectedOption = index;
+                answers[originalIndex] = index;
+            }
+            
+            highlightSelectedOption(index);
+            showFeedback(index);
+            
+            // Enable next button
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function highlightSelectedOption(index) {
+            const options = document.querySelectorAll('.option');
+            const question = filteredQuestions[currentQuestion];
+            const originalIndex = questions.indexOf(question);
+            
+            options.forEach((option, i) => {
+                option.classList.remove('correct', 'incorrect');
+                
+                if (i === index) {
+                    // ALWAYS show correct answers in GREEN
+                    if (i === question.correct) {
+                        option.classList.add('correct');
+                        if (!answers[originalIndex]) score++;
+                        document.getElementById('cancelBtn').classList.remove('show');
+                        
+                        // Remove from incorrect questions if it was there
+                        const incorrectIndex = incorrectQuestions.indexOf(originalIndex);
+                        if (incorrectIndex > -1) {
+                            incorrectQuestions.splice(incorrectIndex, 1);
+                        }
+                    } else {
+                        // ALWAYS show incorrect answers in RED
+                        option.classList.add('incorrect');
+                        // Also highlight the correct answer in GREEN
+                        options[question.correct].classList.add('correct');
+                        document.getElementById('cancelBtn').classList.add('show');
+                        
+                        // Add to incorrect questions
+                        if (!incorrectQuestions.includes(originalIndex)) {
+                            incorrectQuestions.push(originalIndex);
+                        }
+                    }
+                }
+            });
+        }
+
+        function highlightSelectedOptions() {
+            const options = document.querySelectorAll('.option');
+            const question = filteredQuestions[currentQuestion];
+            const originalIndex = questions.indexOf(question);
+            const selectedIndices = answers[originalIndex] || [];
+            
+            // First, highlight ALL correct answers in GREEN
+            question.correct.forEach(correctIndex => {
+                options[correctIndex].classList.add('correct');
+            });
+            
+            // Then, highlight selected options
+            options.forEach((option, i) => {
+                if (selectedIndices.includes(i)) {
+                    // If selected but incorrect, highlight in RED
+                    if (!question.correct.includes(i)) {
+                        option.classList.add('incorrect');
+                    }
+                }
+            });
+            
+            // Check if answer is correct and update score/tracking
+            const allCorrectSelected = question.correct.every(c => selectedIndices.includes(c));
+            const noIncorrectSelected = selectedIndices.every(s => question.correct.includes(s));
+            
+            if (allCorrectSelected && noIncorrectSelected) {
+                if (!answers[originalIndex]) score++;
+                // Remove from incorrect questions
+                const incorrectIndex = incorrectQuestions.indexOf(originalIndex);
+                if (incorrectIndex > -1) {
+                    incorrectQuestions.splice(incorrectIndex, 1);
+                }
+            } else {
+                // Add to incorrect questions
+                if (!incorrectQuestions.includes(originalIndex)) {
+                    incorrectQuestions.push(originalIndex);
+                }
+            }
+        }
+
+        function cancelSelection() {
+            const question = filteredQuestions[currentQuestion];
+            const originalIndex = questions.indexOf(question);
+            
+            selectedOption = null;
+            answers[originalIndex] = null;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.classList.remove('correct', 'incorrect');
+            });
+            
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('rationale').classList.remove('show');
+            document.getElementById('cancelBtn').classList.remove('show');
+            document.getElementById('nextBtn').disabled = true;
+        }
+
+        function showFeedback(index) {
+            const question = filteredQuestions[currentQuestion];
+            const feedback = document.getElementById('feedback');
+            const feedbackIcon = document.getElementById('feedbackIcon');
+            const feedbackText = document.getElementById('feedbackText');
+            const rationale = document.getElementById('rationale');
+            const rationaleText = document.getElementById('rationaleText');
+            
+            if (index === question.correct) {
+                feedback.className = 'feedback correct';
+                feedbackIcon.textContent = '✅';
+                feedbackText.textContent = 'Correct! Well done.';
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedbackIcon.textContent = '❌';
+                feedbackText.textContent = `Incorrect. The right answer is: ${String.fromCharCode(65 + question.correct)}`;
+            }
+            
+            feedback.style.display = 'flex';
+            rationaleText.textContent = question.rationale;
+            rationale.classList.add('show');
+        }
+
+        function showFeedbackForMultiple() {
+            const question = filteredQuestions[currentQuestion];
+            const originalIndex = questions.indexOf(question);
+            const feedback = document.getElementById('feedback');
+            const feedbackIcon = document.getElementById('feedbackIcon');
+            const feedbackText = document.getElementById('feedbackText');
+            const rationale = document.getElementById('rationale');
+            const rationaleText = document.getElementById('rationaleText');
+            
+            const selectedIndices = answers[originalIndex] || [];
+            const allCorrectSelected = question.correct.every(c => selectedIndices.includes(c));
+            const noIncorrectSelected = selectedIndices.every(s => question.correct.includes(s));
+            
+            if (allCorrectSelected && noIncorrectSelected) {
+                feedback.className = 'feedback correct';
+                feedbackIcon.textContent = '✅';
+                feedbackText.textContent = 'Correct! All right answers selected.';
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedbackIcon.textContent = '❌';
+                const correctLetters = question.correct.map(c => String.fromCharCode(65 + c)).join(', ');
+                feedbackText.textContent = `Incorrect. The right answers are: ${correctLetters}`;
+            }
+            
+            feedback.style.display = 'flex';
+            rationaleText.textContent = question.rationale;
+            rationale.classList.add('show');
+        }
+
+        function nextCard() {
+            if (currentQuestion < filteredQuestions.length - 1) {
+                currentQuestion++;
+                selectedOption = null;
+                loadQuestion();
+            } else {
+                const correctCount = questions.reduce((count, question, index) => {
+                    if (answers[index] === null || answers[index] === undefined) return count;
+                    
+                    if (Array.isArray(question.correct)) {
+                        const selected = answers[index] || [];
+                        const allCorrect = question.correct.every(c => selected.includes(c));
+                        const noIncorrect = selected.every(s => question.correct.includes(s));
+                        return allCorrect && noIncorrect ? count + 1 : count;
+                    } else {
+                        return answers[index] === question.correct ? count + 1 : count;
+                    }
+                }, 0);
+                
+                alert(`Quiz completed! Your score: ${correctCount}/${questions.length}\nIncorrect questions: ${incorrectQuestions.length}`);
+                
+                if (studyMode === 'incorrect' && incorrectQuestions.length > 0) {
+                    // Continue with incorrect questions
+                    filteredQuestions = questions.filter((_, index) => incorrectQuestions.includes(index));
+                    currentQuestion = 0;
+                    loadQuestion();
+                } else {
+                    // Reset to all questions
+                    currentQuestion = 0;
+                    selectedOption = null;
+                    score = 0;
+                    answers = Array(questions.length).fill(null);
+                    filteredQuestions = [...questions];
+                    setStudyMode('all');
+                }
+            }
+        }
+
+        function previousCard() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                const question = filteredQuestions[currentQuestion];
+                const originalIndex = questions.indexOf(question);
+                selectedOption = answers[originalIndex];
+                loadQuestion();
+            }
+        }
+
+        // Initialize the app
+        loadQuestion();
+    </script>
+</body>
+</html>
